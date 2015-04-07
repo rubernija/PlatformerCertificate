@@ -41,8 +41,13 @@ var fpsCount = 0;
 var fpsTime = 0;
 
 // load an image to draw
-var chuckNorris = document.createElement("img");
-chuckNorris.src = "hero.png";
+//var chuckNorris = document.createElement("img");
+//chuckNorris.src = "hero.png";
+
+var Keyboard = new Keyboard();
+var Player = new Player();
+var Enemey = new Enemey();
+var Vector2 = new Vector2();
 
 function run()
 {
@@ -51,8 +56,17 @@ function run()
 	
 	var deltaTime = getDeltaTime();
 	
-	context.drawImage(chuckNorris, SCREEN_WIDTH/2 - chuckNorris.width/2, SCREEN_HEIGHT/2 - chuckNorris.height/2);
+	//context.drawImage(chuckNorris, SCREEN_WIDTH/2 - chuckNorris.width/2, SCREEN_HEIGHT/2 - chuckNorris.height/2);
 	
+	Player.update(deltaTime);
+	Player.draw();
+	
+	Enemey.update(deltaTime);
+	Enemey.draw();
+	
+	
+	Vector2.multiplyScalar;
+
 		
 	// update the frame counter 
 	fpsTime += deltaTime;

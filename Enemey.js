@@ -1,8 +1,8 @@
-var Player = function()
+var Enemey = function()
 {
   this.image = document.createElement("img");
   
-  this.x = canvas.width / 4;
+  this.x = canvas.width / 1.5;
   this.y = canvas.height / 2;
   
   this.width = 159;
@@ -15,27 +15,24 @@ var Player = function()
   
   this.rotation = 0;
   
-  this.image.src = "hero.png"; 
+  this.image.src = "ship.png"; 
 };
 
-
-Player.prototype.update = function(deltaTime)
+Enemey.prototype.update = function(deltaTime)
 {
-   if ( Keyboard.isKeyDown(Keyboard.KEY_D) )
+   if ( Keyboard.isKeyDown(Keyboard.KEY_SPACE) )
  {
-  this.rotation += deltaTime;
+  this.rotation -= deltaTime;
  }
  else 
  { 
- this.rotation -= deltaTime;
+ this.rotation += deltaTime;
 }
  
  }
  
- 
 
-
-Player.prototype.draw = function()
+Enemey.prototype.draw = function()
 {
    context.save();
      
