@@ -7,20 +7,20 @@ var Vector2 = function()
 //adding to the vector 
 Vector2.prototype.add = function(other_vector)
 {
- var result = new Vedctor2();
+ var result = new Vector2();
 
-   result.x = this.x + other_vector.X;
+   result.x = this.x + other_vector.x;
    result.y = this.y + other_vector.y;
-  
+
     return result; 
    }
 
 //subtracting the Vector   
 Vector2.prototype.subtract = function (other_vector)  
 {
- var result = new Vedctor2();
+ var result = new Vector2();
 
-   result.x = this.x - other_vector.X;
+   result.x = this.x - other_vector.x;
    result.y = this.y - other_vector.y;
   
     return result; 
@@ -30,7 +30,7 @@ Vector2.prototype.subtract = function (other_vector)
    //Multiply Vector    
 Vector2.prototype.multiplyScalar = function( scalar )
 {
-   var result = new Vector2()
+   var result = new Vector2();
    
    result.x = this.x * scalar;
    result.y = this.y * scalar;
@@ -52,7 +52,7 @@ Vector2.prototype.normalize = function()
 {
   var len = this.length();
 
-  var result = new vector2();
+  var result = new Vector2();
 
   result.x = this.x / len;
   result.y = this.y / len;   

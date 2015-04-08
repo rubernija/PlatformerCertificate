@@ -44,10 +44,152 @@ var fpsTime = 0;
 //var chuckNorris = document.createElement("img");
 //chuckNorris.src = "hero.png";
 
-var Keyboard = new Keyboard();
-var Player = new Player();
-var Enemey = new Enemey();
-var Vector2 = new Vector2();
+var keyboard = new Keyboard();
+var player = new Player();
+var enemey = new Enemey();
+
+var LAYER_COUNT = 3;
+var MAP = {tw:95, th:19};
+var TILE = 35;
+var TILESET_TILE = 70;
+var TILESET_PADDING = 2;
+var TILESET_SPACING = 2;
+var TILESET_COUNT_X = 14;
+var TILESET_COUNT_Y = 14;
+
+
+var LAYER_PLATFORMS = 0;
+var LAYER_BACKGROUND = 1;
+var LAYER_LADDERS = 2;
+
+
+
+var tileset = document.createElement("img");
+tileset.src = "tileset.png";
+
+
+
+var cells = [];
+
+function initializeCollision()
+{
+   for ( var layerIdx = 0 ; layerIdx < LAYER_COUNT ; ++layerIdx )
+   {
+      cells[layerIdx] = [];
+	  var idx = 0;
+        
+		for ( var y = 0 ; y < TileMaps["level1"].layers[layerIdx].height ; ++y )
+		{
+		    cells[layerIdx][y] = []
+		    //loop through each cell
+		    for ( var x = 0 ; x < TileMaps["level1"].layers[layerIdx].width ; ++x)
+		   {
+		      if ( TileMaps["level1"].layers [layerIdx].data[idx != 0])
+		      {
+			      cells[layerIdx][y][x] = 1;
+				  cells[layerIdx][y][x+1] = 1;
+				  cells[layerIdx][y-1][x+1] = 1;
+				  cells[layerIdx][y-1][x] = 1;
+			  
+			  }
+		     else if (cells[layerIdx][y][x] != 1)
+			 {
+			     cells[layerIdx][y][x] = 0;
+			 }
+		   
+		   }
+		    ++idx;
+		}
+	 }
+   }
+
+   
+   
+function drawMap()	
+{  //this loops over all the layers in our tilemap
+  for (var layerIdx = 0 ; layerIdx < LAYER_COUNT ; ++layerIdx )
+  {
+    //render everything in the current layer (layerIdx)
+    //look at every tile in the current layer, and render them.
+    
+	var idx = 0; 
+	
+	//look at each row
+    for ( var y = 0 ; y < TileMaps["level1"].layers[layerIdx].height ; ++ y )
+   {
+     //look at each tile in the row 
+    for ( var x = 0 ; x < TileMaps["level1"].layers[layerIdx].width ; ++ x )
+	{
+	  
+	  var tileIndex = TileMaps["level1"].layers[layerIdx].data[idx] - 1;
+	  
+	    if ( tileIndex != -1 )
+		{
+		   //draws the  current tile at the current location 
+		
+		   var sx = TILESET_PADDING + (tileIndex % TILESET_COUNT_X)*
+                                      (TILESET_TILE + TILESET_SPACING);
+		   var sy = TILESET_PADDING + (Math.floor(tileIndex / TILESET_COUNT_X))*
+		                              (TILESET_TILE + TILESET_SPACING);
+		   var dx = x * TILE;
+		   var dy = (y-1) * TILE;
+		   
+		   
+		   context.drawImage(tileset, sx , sy, TILESET_TILE, TILESET_TILE,
+		                              dx, dy, TILESET_TILE, TILESET_TILE); 
+		  
+		}
+		
+		++idx;
+	}
+   
+   }	
+  
+  }
+
+ }
+
+
+
+ 
+ function tileToPixel(tile_coord)
+ {
+     return tile_coord * TILE;
+ }
+ 
+ function pixelToTile(pixel)
+ {
+    return Math.floor(pixel / TILE);
+ }
+ 
+ 
+ function cellAtTileCoord(layer, tx, ty)
+ {
+     if ( tx < 0 || tx > MAP.tw || ty < 0 )
+	 {
+	      return 1;
+	 }
+     
+	 if ( ty >=MAP.th )
+     {
+	   return 0;
+	 }	 
+  
+    return cells[layer][tx][ty];
+}
+
+function cellAtPixelCoord(layer, x, y)
+{
+    var tx = pixelToTile(x);
+	var ty = pixelToTile(y);
+	
+	return cellAtTileCoord(layer, tx, ty);
+}
+ 
+ 
+ 
+ 
+ 
 
 function run()
 {
@@ -57,15 +199,16 @@ function run()
 	var deltaTime = getDeltaTime();
 	
 	//context.drawImage(chuckNorris, SCREEN_WIDTH/2 - chuckNorris.width/2, SCREEN_HEIGHT/2 - chuckNorris.height/2);
+	drawMap();
 	
-	Player.update(deltaTime);
-	Player.draw();
+	player.update(deltaTime);
+	player.draw();
 	
-	Enemey.update(deltaTime);
-	Enemey.draw();
+	enemey.update(deltaTime);
+	enemey.draw();
 	
 	
-	Vector2.multiplyScalar;
+	
 
 		
 	// update the frame counter 
@@ -83,6 +226,16 @@ function run()
 	context.font="14px Arial";
 	context.fillText("FPS: " + fps, 5, 20, 100);
 }
+
+
+//
+//replace level1. 
+//with TileMaps["level1"].
+//
+
+initializeCollision();
+	
+
 
 
 //-------------------- Don't modify anything below here

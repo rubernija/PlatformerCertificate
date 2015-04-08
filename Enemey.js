@@ -20,11 +20,11 @@ var Enemey = function()
 
 Enemey.prototype.update = function(deltaTime)
 {
-   if ( Keyboard.isKeyDown(Keyboard.KEY_SPACE) )
+ // if ( keyboard.isKeyUp( keyboard.KEY_SPACE) )
  {
   this.rotation -= deltaTime;
  }
- else 
+// else 
  { 
  this.rotation += deltaTime;
 }
