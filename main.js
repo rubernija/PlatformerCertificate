@@ -43,13 +43,14 @@ var fpsTime = 0;
 // load an image to draw
 //var chuckNorris = document.createElement("img");
 //chuckNorris.src = "hero.png";
+var heartImage = document.createElement("img");
+heartImage.src = "heartImage.psd";
 
-var keyboard = new Keyboard();
-var player = new Player();
-var enemey = new Enemey();
+var score = 0;
+var lives = 3;
 
 var LAYER_COUNT = 3;
-var MAP = {tw:95, th:19};
+var MAP = {tw:131, th:19};
 var TILE = 35;
 var TILESET_TILE = 70;
 var TILESET_PADDING = 2;
@@ -63,6 +64,23 @@ var LAYER_BACKGROUND = 1;
 var LAYER_LADDERS = 2;
 
 
+var LEFT = 0;
+var RIGHT = 1;
+
+var ANIM_IDLE_LEFT = 0;
+var ANIM_JUMP_LEFT = 1;
+var ANIM_WALK_LEFT = 2;
+
+var ANIM_IDLE_RIGHT = 3;
+var ANIM_JUMP_RIGHT = 4;
+var ANIM_WALK_RIGHT = 5;
+
+var ANIM_MAX = 6;
+
+
+var keyboard = new Keyboard();
+var player = new Player();
+var enemey = new Enemey();
 
 var tileset = document.createElement("img");
 tileset.src = "tileset.png";
@@ -80,16 +98,16 @@ function initializeCollision()
         
 		for ( var y = 0 ; y < TileMaps["level1"].layers[layerIdx].height ; ++y )
 		{
-		    cells[layerIdx][y] = []
+		    cells[layerIdx][y] = [];
 		    //loop through each cell
-		    for ( var x = 0 ; x < TileMaps["level1"].layers[layerIdx].width ; ++x)
+		    for ( var x = 0 ; x < TileMaps["level1"].layers[layerIdx].width ; x++)
 		   {
-		      if ( TileMaps["level1"].layers [layerIdx].data[idx != 0])
+		      if ( TileMaps["level1"].layers[layerIdx].data[idx] != 0)
 		      {
 			      cells[layerIdx][y][x] = 1;
-				  cells[layerIdx][y][x+1] = 1;
-				  cells[layerIdx][y-1][x+1] = 1;
 				  cells[layerIdx][y-1][x] = 1;
+				  cells[layerIdx][y-1][x+1] = 1;
+				  cells[layerIdx][y-1][x+1] = 1;
 			  
 			  }
 		     else if (cells[layerIdx][y][x] != 1)
@@ -97,12 +115,50 @@ function initializeCollision()
 			     cells[layerIdx][y][x] = 0;
 			 }
 		   
-		   }
 		    ++idx;
+		   }
 		}
 	 }
    }
 
+   function cellAtPixelCoord(layer, x, y)
+{
+    var tx = pixelToTile(x);
+	var ty = pixelToTile(y);
+	
+	return cellAtTileCoord(layer, tx, ty);
+}
+   
+   
+   
+   
+ function tileToPixel(tile_coord)
+ {
+     return tile_coord * TILE;
+ }
+ 
+ function pixelToTile(pixel)
+ {
+    return Math.floor(pixel / TILE);
+ }
+ 
+ 
+ function cellAtTileCoord(layer, tx, ty)
+ {
+     if ( tx < 0 || tx >= MAP.tw || ty < 0 )
+	 {
+	      return 1;
+	 }
+     
+	 if ( ty >=MAP.th )
+     {
+	   return 0;
+	 }	 
+	
+    return cells[layer][ty][tx];
+}
+
+   
    
    
 function drawMap()	
@@ -146,50 +202,19 @@ function drawMap()
    }	
   
   }
-
- }
-
-
-
- 
- function tileToPixel(tile_coord)
- {
-     return tile_coord * TILE;
- }
- 
- function pixelToTile(pixel)
- {
-    return Math.floor(pixel / TILE);
- }
- 
- 
- function cellAtTileCoord(layer, tx, ty)
- {
-     if ( tx < 0 || tx > MAP.tw || ty < 0 )
-	 {
-	      return 1;
-	 }
-     
-	 if ( ty >=MAP.th )
-     {
-	   return 0;
-	 }	 
+	context.fillStyle = "yellow";
+	context.font = "32px Arial"; 
+	var scoreText = "Score: " + score;
+	context.fillText(scoreText, SCREEN_WIDTH - 170, 35);
   
-    return cells[layer][tx][ty];
-}
+     for (var i=0; i<lives; i++)
+	 {
+	       //context.drawImage(heartImage);
+	 }
+ 
+ }
 
-function cellAtPixelCoord(layer, x, y)
-{
-    var tx = pixelToTile(x);
-	var ty = pixelToTile(y);
-	
-	return cellAtTileCoord(layer, tx, ty);
-}
- 
- 
- 
- 
- 
+  
 
 function run()
 {
@@ -197,6 +222,11 @@ function run()
 	context.fillRect(0, 0, canvas.width, canvas.height);
 	
 	var deltaTime = getDeltaTime();
+	
+	if ( deltaTime > 0.03)
+	{
+	  deltaTime = 0.03;
+	}
 	
 	//context.drawImage(chuckNorris, SCREEN_WIDTH/2 - chuckNorris.width/2, SCREEN_HEIGHT/2 - chuckNorris.height/2);
 	drawMap();

@@ -3,7 +3,7 @@ var Enemey = function()
   this.image = document.createElement("img");
   
   this.x = canvas.width / 1.5;
-  this.y = canvas.height / 2;
+  this.y = canvas.height / 3.2;
   
   this.width = 159;
   this.height = 163;
@@ -15,7 +15,7 @@ var Enemey = function()
   
   this.rotation = 0;
   
-  this.image.src = "ship.png"; 
+  this.image.src = "enemey.png"; 
 };
 
 Enemey.prototype.update = function(deltaTime)
