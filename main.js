@@ -4,6 +4,11 @@ var context = canvas.getContext("2d");
 var startFrameMillis = Date.now();
 var endFrameMillis = Date.now();
 
+var STATE_SPLASH = 0;
+var STATE_GAME = 1;
+var STATE_GAMEOVER = 2;
+var gameState = STATE_SPLASH;
+
 // This function will return the time in seconds since the function 
 // was last called
 // You should only call this function once per frame
@@ -80,11 +85,20 @@ var ANIM_MAX = 6;
 
 var keyboard = new Keyboard();
 var player = new Player();
-var enemey = new Enemey();
+var enemies = [];
+
+
+ enemies.push(new Enemey(4550,290));
+ enemies.push(new Enemey(750,290));
+ //enemies.push(new Enemey(2050,290));
+ //enemies.push(new Enemey(950,290));
+ //enemies.push(new Enemey(1050,290));
+ //enemies.push(new Enemey(1150,290));
 
 var tileset = document.createElement("img");
 tileset.src = "tileset.png";
 
+var timer = 0;
 
 
 var cells = [];
@@ -161,8 +175,10 @@ function initializeCollision()
    
    
    
-function drawMap()	
-{  //this loops over all the layers in our tilemap
+function drawMap(offsetX, offsetY)	
+{  
+
+  //this loops over all the layers in our tilemap
   for (var layerIdx = 0 ; layerIdx < LAYER_COUNT ; ++layerIdx )
   {
     //render everything in the current layer (layerIdx)
@@ -186,9 +202,10 @@ function drawMap()
 		   var sx = TILESET_PADDING + (tileIndex % TILESET_COUNT_X)*
                                       (TILESET_TILE + TILESET_SPACING);
 		   var sy = TILESET_PADDING + (Math.floor(tileIndex / TILESET_COUNT_X))*
-		                              (TILESET_TILE + TILESET_SPACING);
-		   var dx = x * TILE;
-		   var dy = (y-1) * TILE;
+		                              (TILESET_TILE + TILESET_SPACING)
+									  
+		   var dx = x * TILE - offsetX;
+		   var dy = (y-1) * TILE - offsetY;
 		   
 		   
 		   context.drawImage(tileset, sx , sy, TILESET_TILE, TILESET_TILE,
@@ -202,19 +219,38 @@ function drawMap()
    }	
   
   }
-	context.fillStyle = "yellow";
-	context.font = "32px Arial"; 
-	var scoreText = "Score: " + score;
-	context.fillText(scoreText, SCREEN_WIDTH - 170, 35);
-  
+		
+	
+	
      for (var i=0; i<lives; i++)
 	 {
 	       //context.drawImage(heartImage);
 	 }
  
+    
  }
 
   
+  var bgMusic = new Howl(
+  {
+     urls:["music.mp3"],
+	 loop:true,
+	 buffer:true,
+	 volume:0.5
+  }); 
+  bgMusic.play(); 
+  
+function runSplash(deltaTime)
+{
+   if ( this.health <= 0 )
+   {
+         gameState = STATE_GAMEOVER;
+		 return;
+   }
+       context.fillStyle = "#000";
+	   context.font = "24px Arial";
+	   context.fillText("You Lose", 200, 140);
+  }
 
 function run()
 {
@@ -228,18 +264,57 @@ function run()
 	  deltaTime = 0.03;
 	}
 	
+	switch(gameState)
+	{
+	case STATE_GAME:
+		runSplash(deltaTime);
+		break;
+	case STATE_GAMEOVER:
+	 runGameOver(deltaTime);
+	}
+	
+	
+	
+	
+	timer += deltaTime;
+	
+	var xScroll = player.position.x - player.startPos.x;
+	var yScroll = 0;
+	
+	if ( xScroll < 0 )
+	    xScroll =0;
+	if (xScroll > MAP.tw * TILE - canvas.width)
+	    xScroll = MAP.tw * TILE - canvas.width;
+	
 	//context.drawImage(chuckNorris, SCREEN_WIDTH/2 - chuckNorris.width/2, SCREEN_HEIGHT/2 - chuckNorris.height/2);
-	drawMap();
+	drawMap(xScroll, 0);
 	
 	player.update(deltaTime);
-	player.draw();
+	player.draw(xScroll, 0);
 	
-	enemey.update(deltaTime);
-	enemey.draw();
+	context.fillStyle = "yellow";
+	context.font = "32px Arial"; 
+	var timerSeconds = Math.floor(timer);
+	var timerMilliseconds = Math.floor((timer - timerSeconds ) * 1000);
+	var textToDisplay = "Timer: " + timerSeconds + ":" + timerMilliseconds;
+	context.fillText(textToDisplay, 1300, 30);
+   
 	
 	
 	
+	for ( var i = 0 ; i < enemies.length ; ++i )
+	{
+		enemies[i].update(deltaTime);
+		enemies[i].draw(xScroll,yScroll);
+	}
+	
+	if ( player.health <=0 )
+	{
+	  player.position.set(canvas.width/8, canvas.height/2 );
+	  player.health = 4;
+	}
 
+			
 		
 	// update the frame counter 
 	fpsTime += deltaTime;
